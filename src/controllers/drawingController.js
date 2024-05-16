@@ -25,4 +25,35 @@ const getDrawings = async (req, res) => {
     }
 };
 
-module.exports = { createDrawing, getDrawings };
+const updateDrawing = async (req, res) => {
+    const { id } = req.params;
+    const { data } = req.body;
+    const userId = req.user.userId;
+
+    try {
+        const drawing = await Drawing.findOneAndUpdate({ _id: id, user: userId }, { data }, { new: true });
+        if (!drawing) {
+            return res.status(404).json({ message: 'Drawing not found' });
+        }
+        res.status(200).json(drawing);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+const deleteDrawing = async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.userId;
+
+    try {
+        const drawing = await Drawing.findOneAndDelete({ _id: id, user: userId });
+        if (!drawing) {
+            return res.status(404).json({ message: 'Drawing not found' });
+        }
+        res.status(200).json({ message: 'Drawing deleted' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+module.exports = { createDrawing, getDrawings, updateDrawing, deleteDrawing };
